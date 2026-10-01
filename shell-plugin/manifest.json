@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "local.omabird",
+  "name": "OmaBird",
+  "version": "0.1.0",
+  "description": "Open OmaBird or compose a message from the Omarchy bar.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "BarWidget.qml"},
+  "barWidget": {
+    "displayName": "OmaBird",
+    "description": "Left-click opens mail; right-click composes a message.",
+    "category": "Apps",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

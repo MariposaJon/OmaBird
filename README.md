@@ -17,6 +17,9 @@ updates and its normal keyboard shortcuts.
   when no applicable message is selected.
 - Installs an OmaBird launcher, compose launcher action and a palette-colored SVG
   icon. It does not change the default mail handler.
+- Adds a native Omarchy bar mail icon before the system tray: left-click opens
+  OmaBird, right-click composes a message. Its colors, geometry, tooltip and hover
+  behavior come from Omarchy's own bar components.
 - Updates on Omarchy `theme-set` and `font-set` hooks. The add-on reads the local
   palette every 1.5 seconds and applies changes while Betterbird is open.
 
@@ -30,7 +33,7 @@ python3 omabird.py install
 ```
 
 This builds `dist/omabird.xpi`, installs `~/.local/bin/omabird`, adds desktop
-integration and synchronizes the current theme. Install the XPI in Betterbird:
+integration, enables the shell plugin and synchronizes the current theme. Install the XPI in Betterbird:
 **Add-ons and Themes → gear menu → Install Add-on From File**.
 
 Launch **OmaBird** from your desktop launcher, or run `omabird launch`.
@@ -93,10 +96,12 @@ palette state, then restore it; they do not switch the desktop theme.
 
 ## Remove
 
-Disable or remove **OmaBird** in Betterbird's Add-ons and Themes. Remove the
+Disable or remove **OmaBird** in Betterbird's Add-ons and Themes.
+Disable the bar widget with `omarchy plugin disable local.omabird`. Remove the
 integration files if you also want to stop synchronization:
 
 ```sh
+omarchy plugin remove local.omabird --yes
 rm ~/.config/omarchy/hooks/theme-set.d/omabird-theme-hook
 rm ~/.config/omarchy/hooks/font-set.d/omabird-theme-hook
 rm ~/.local/bin/omabird

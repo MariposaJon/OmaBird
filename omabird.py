@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import tempfile
 import zipfile
@@ -104,6 +105,19 @@ Name=Write new message
 Exec={bindir}/omabird launch -compose
 ''')
     subprocess.run(['update-desktop-database', str(HOME / '.local/share/applications')], check=False)
+    plugin = HOME / '.config/omarchy/plugins/local.omabird'
+    plugin.mkdir(parents=True, exist_ok=True)
+    for asset in (ROOT / 'shell-plugin').iterdir():
+        shutil.copy2(asset, plugin / asset.name)
+    subprocess.run(['omarchy', 'plugin', 'validate', str(plugin)], check=True)
+    subprocess.run(['omarchy-shell', 'shell', 'rescanPlugins'], check=True)
+    shell_config = json.loads((HOME / '.config/omarchy/shell.json').read_text())
+    layout = shell_config.get('bar', {}).get('layout', {})
+    present = any(entry.get('id') == 'local.omabird'
+                  for section in layout.values() if isinstance(section, list)
+                  for entry in section if isinstance(entry, dict))
+    if not present:
+        subprocess.run(['omarchy', 'plugin', 'enable', 'local.omabird', '--before', 'omarchy.tray'], check=True)
 
 
 def main():
