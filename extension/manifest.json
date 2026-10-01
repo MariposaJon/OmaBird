@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "OmaBird",
+  "version": "0.1.0",
+  "description": "Omarchy colors, typography and a keyboard action menu for Betterbird.",
+  "browser_specific_settings": {"gecko": {"id": "omabird@local.omarchy", "strict_min_version": "153.0", "strict_max_version": "153.*"}},
+  "background": {"scripts": ["background.js"]},
+  "experiment_apis": {
+    "omaBird": {
+      "schema": "api/schema.json",
+      "parent": {"scopes": ["addon_parent"], "paths": [["omaBird"]], "script": "api/implementation.js"}
+    }
+  }
+}

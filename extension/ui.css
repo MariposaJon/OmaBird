@@ -1,0 +1,129 @@
+/* Only app chrome is themed. Message HTML and the compose editor retain their fonts. */
+@-moz-document url-prefix("chrome://messenger/"), url("about:3pane"), url("about:message"), url("about:addressbook"), url("about:preferences") {
+  :root {
+    color-scheme: var(--oma-mode) !important;
+    --layout-background-0: var(--oma-bg) !important;
+    --layout-background-1: var(--oma-panel) !important;
+    --layout-background-2: var(--oma-hover) !important;
+    --layout-background-3: var(--oma-hover) !important;
+    --layout-background-4: var(--oma-selection) !important;
+    --layout-color-0: var(--oma-fg) !important;
+    --layout-color-1: var(--oma-fg) !important;
+    --layout-color-2: var(--oma-secondary) !important;
+    --layout-color-3: var(--oma-secondary) !important;
+    --layout-border-0: var(--oma-border) !important;
+    --layout-border-1: var(--oma-border) !important;
+    --layout-border-2: var(--oma-border) !important;
+    --primary: var(--oma-accent) !important;
+    --selected-item-color: var(--oma-accent) !important;
+    --selected-item-text-color: var(--oma-on-accent) !important;
+    --color-primary-default: var(--oma-accent) !important;
+    --color-text-base: var(--oma-fg) !important;
+    --color-text-secondary: var(--oma-secondary) !important;
+    --color-surface-base: var(--oma-bg) !important;
+    --color-surface-subtle: var(--oma-panel) !important;
+    --color-surface-border: var(--oma-border) !important;
+    --color-surface-border-intense: var(--oma-border) !important;
+    --tree-view-bg: var(--oma-bg) !important;
+    --tree-view-color: var(--oma-fg) !important;
+    --treeitem-background-hover: var(--oma-hover) !important;
+    --treeitem-background-active: var(--oma-selection) !important;
+    --treeitem-text-active: var(--oma-fg) !important;
+    --listbox-hover: var(--oma-hover) !important;
+    --listbox-selected-bg: var(--oma-selection) !important;
+    --listbox-focused-selected-bg: var(--oma-selection) !important;
+    --listbox-selected-color: var(--oma-fg) !important;
+    --unread-color: var(--oma-accent) !important;
+    --panel-background-color: var(--oma-panel) !important;
+    --panel-text-color: var(--oma-fg) !important;
+    --panel-border-color: var(--oma-border) !important;
+    --arrowpanel-background: var(--oma-panel) !important;
+    --arrowpanel-color: var(--oma-fg) !important;
+    --arrowpanel-border-color: var(--oma-border) !important;
+    --lwt-accent-color: var(--oma-panel) !important;
+    --lwt-text-color: var(--oma-fg) !important;
+    --toolbar-bgcolor: var(--oma-panel) !important;
+    --toolbar-color: var(--oma-fg) !important;
+    --toolbar-field-background-color: var(--oma-bg) !important;
+    --toolbar-field-color: var(--oma-fg) !important;
+    --toolbar-field-border-color: var(--oma-border) !important;
+    --toolbar-field-focus-border-color: var(--oma-accent) !important;
+    --focus-outline-color: var(--oma-accent) !important;
+    --button-border-radius: 4px !important;
+    --button-min-height: 28px !important;
+    --button-padding: 4px !important;
+    --button-padding-wide: 4px 10px !important;
+    --thread-pane-unread-fill: var(--oma-accent) !important;
+    --thread-pane-unread-stroke: var(--oma-accent) !important;
+    --folder-color-inbox: var(--oma-accent) !important;
+    --folder-color-folder: var(--oma-secondary) !important;
+    background-color: var(--oma-bg) !important;
+    color: var(--oma-fg) !important;
+    font-family: var(--oma-font), monospace !important;
+    scrollbar-color: var(--oma-border) var(--oma-bg);
+  }
+  body, button, input, select, menulist, menu, menuitem, toolbarbutton, label, description {
+    font-family: var(--oma-font), monospace !important;
+  }
+  #folderPane, #spacesToolbar, #unifiedToolbar, #tabs-toolbar, #status-bar,
+  #messageHeader, #composeToolbar2, #MsgHeadersToolbar, #attachmentBar {
+    background: var(--oma-panel) !important;
+    color: var(--oma-fg) !important;
+    border-color: var(--oma-border) !important;
+  }
+  #threadPane, #threadTree, #threadPaneHeader, #folderPaneHeader {
+    background-color: var(--oma-bg) !important;
+    color: var(--oma-fg) !important;
+  }
+  #folderTree li.selected > .container, #threadTree tr.selected {
+    background-color: var(--oma-selection) !important;
+    color: var(--oma-fg) !important;
+    box-shadow: inset 3px 0 var(--oma-accent);
+  }
+  #folderTree li:not(.selected) > .container:hover, #threadTree tr:not(.selected):hover {
+    background-color: var(--oma-hover) !important;
+  }
+  :is(button, input, toolbarbutton):focus-visible {
+    outline: 2px solid var(--oma-accent) !important;
+    outline-offset: 2px;
+  }
+  .tabmail-tab[selected] { box-shadow: inset 0 -2px var(--oma-accent); }
+  #omabird-menu-button {
+    margin-inline: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--oma-border);
+    border-radius: 4px;
+    background: var(--oma-bg);
+    color: var(--oma-accent);
+  }
+  #omabird-overlay {
+    position: fixed; inset: 0; z-index: 2147483647;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: min(16vh, 120px); background: rgb(0 0 0 / 45%);
+    font-family: var(--oma-font), monospace;
+  }
+  #omabird-dialog {
+    width: min(540px, 85vw); padding: 16px; border: 2px solid var(--oma-accent);
+    border-radius: 8px; background: var(--oma-panel); color: var(--oma-fg);
+    box-shadow: 0 12px 48px rgb(0 0 0 / 40%);
+  }
+  #omabird-heading { font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+  #omabird-search {
+    box-sizing: border-box; width: 100%; padding: 10px 12px; margin: 0 0 10px;
+    border: 1px solid var(--oma-border); border-radius: 4px;
+    background: var(--oma-bg) !important; color: var(--oma-fg) !important; font-size: 13px;
+  }
+  #omabird-results { display: flex; flex-direction: column; gap: 3px; max-height: 45vh; overflow-y: auto; }
+  .omabird-action {
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; padding: 9px 10px; border: 0 !important; border-radius: 4px;
+    background: transparent !important; color: var(--oma-fg) !important; text-align: start;
+    font-size: 13px; cursor: pointer;
+  }
+  .omabird-action[aria-selected="true"], .omabird-action:hover {
+    background: var(--oma-selection) !important; box-shadow: inset 3px 0 var(--oma-accent);
+  }
+  .omabird-action:disabled { opacity: .45; cursor: default; }
+  .omabird-shortcut, #omabird-hint { color: var(--oma-secondary); font-size: 11px; }
+  #omabird-hint { margin-top: 12px; }
+}

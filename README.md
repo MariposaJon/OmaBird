@@ -1,0 +1,112 @@
+# OmaBird
+
+Betterbird with Omarchy's current colors, desktop font and a keyboard command menu.
+
+OmaBird 0.1 targets Betterbird **153 ESR**. It is a local customization add-on,
+not a replacement mail engine. Betterbird continues to manage accounts, messages,
+updates and its normal keyboard shortcuts.
+
+## What it does
+
+- Maps the active Omarchy palette onto the app's panes, toolbars, tabs, menus,
+  settings and compose controls. Dark and light palettes are supported.
+- Uses the selected Omarchy font for app controls. Message bodies and the compose
+  editor retain their own typography.
+- Adds a searchable command menu: **Ctrl+Shift+P**, or the **OmaBird** toolbar
+  button. Arrow keys select, Enter runs, Escape closes. Mail actions are disabled
+  when no applicable message is selected.
+- Installs an OmaBird launcher, compose launcher action and a palette-colored SVG
+  icon. It does not change the default mail handler.
+- Updates on Omarchy `theme-set` and `font-set` hooks. The add-on reads the local
+  palette every 1.5 seconds and applies changes while Betterbird is open.
+
+## Install
+
+Requirements: Omarchy with `omarchy-theme-color` and hook support, Python 3,
+Betterbird 153 ESR.
+
+```sh
+python3 omabird.py install
+```
+
+This builds `dist/omabird.xpi`, installs `~/.local/bin/omabird`, adds desktop
+integration and synchronizes the current theme. Install the XPI in Betterbird:
+**Add-ons and Themes → gear menu → Install Add-on From File**.
+
+Launch **OmaBird** from your desktop launcher, or run `omabird launch`.
+
+```sh
+omabird sync                 # Re-read current desktop colors and font
+python3 omabird.py build      # Package a changed add-on
+```
+
+To update, rebuild and install the new XPI through Add-ons and Themes.
+
+## Architecture
+
+`omabird.py` asks Omarchy's own palette resolver for semantic colors and writes
+`~/.local/state/omabird/palette.json` atomically. The theme and font hooks run
+`omabird sync`. The launcher also synchronizes before opening Betterbird.
+
+The local Thunderbird Experiment API registers a user stylesheet for app chrome,
+reads palette changes, and attaches the command menu. It uses native command
+controllers for message actions. No native-messaging daemon or local HTTP service
+is needed. The palette is retained if a new file is invalid; all injected styles,
+buttons and event listeners are removed when the add-on is disabled.
+
+An Experiment has unrestricted application/computer access, as stated by
+Thunderbird's add-on installer. OmaBird uses it for local palette reads, app
+styling and menu commands. Source is under `extension/api/implementation.js`.
+It makes no network requests and does not register telemetry. Mozilla UI selectors
+can change; the manifest intentionally limits installation to the tested 153 ESR
+series. Message HTML is outside the stylesheet's URL scope.
+
+## Verification
+
+The integration suite was run against Betterbird 153.4.0. It verifies:
+
+- Add-on startup and the Ctrl+Shift+P shortcut.
+- Marking a synthetic local message as read through the command menu.
+- Folder filtering, empty results and Escape behavior.
+- Live Tokyo Night, Catppuccin Latte and Vantablack palettes, including light/dark
+  mode in the nested mail pane.
+- Invalid-palette fallback and cleanup on disable.
+
+The suite requires a **disposable** profile at `.test-profile` and Marionette
+port 2829. It refuses to run against another profile. Never enable test automation
+on your everyday mail profile.
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install marionette_driver
+mkdir -p .test-profile
+printf 'user_pref("marionette.port", 2829);\n' > .test-profile/user.js
+MOZ_DBUS_REMOTE=0 betterbird --no-remote --new-instance \
+  --profile "$PWD/.test-profile" --marionette --remote-allow-system-access
+# In another terminal:
+python3 omabird.py build
+.venv/bin/python tests/smoke.py
+```
+
+The tests create only synthetic local messages. They briefly change OmaBird's
+palette state, then restore it; they do not switch the desktop theme.
+
+## Remove
+
+Disable or remove **OmaBird** in Betterbird's Add-ons and Themes. Remove the
+integration files if you also want to stop synchronization:
+
+```sh
+rm ~/.config/omarchy/hooks/theme-set.d/omabird-theme-hook
+rm ~/.config/omarchy/hooks/font-set.d/omabird-theme-hook
+rm ~/.local/bin/omabird
+rm ~/.local/share/applications/omabird.desktop
+rm ~/.local/share/icons/hicolor/scalable/apps/omabird.svg
+update-desktop-database ~/.local/share/applications
+```
+
+## References
+
+- [Omarchy](https://omarchy.org/)
+- [Betterbird](https://www.betterbird.eu/)
+- [Thunderbird Experiment API lifecycle](https://developer.thunderbird.net/add-ons/mailextensions/experiments)
