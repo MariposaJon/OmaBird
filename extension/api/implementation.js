@@ -1,4 +1,7 @@
-var omaBird = class extends ExtensionCommon.ExtensionAPI {
+// SPDX-License-Identifier: MIT
+var omaBird = (() => {
+  /* @include-mail-bridge */
+  return class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
     return { omaBird: { start: async () => this.start(context.extension) } };
   }
@@ -16,7 +19,9 @@ var omaBird = class extends ExtensionCommon.ExtensionAPI {
         resolve(NetUtil.readInputStreamToString(stream, stream.available(), { charset: 'UTF-8' }));
       });
     });
-    this.statePath = PathUtils.join(Services.dirsvc.get('Home', Ci.nsIFile).path, '.local', 'state', 'omabird', 'palette.json');
+    const stateDirectory = Services.env.get('OMABIRD_STATE_DIR') || PathUtils.join(Services.dirsvc.get('Home', Ci.nsIFile).path, '.local', 'state', 'omabird');
+    this.statePath = PathUtils.join(stateDirectory, 'palette.json');
+    this.mailBridge = new OmaBirdMailBridge(this);
     await this.refresh();
     this.support.registerWindowListener(extension.id, {
       chromeURLs: ['chrome://messenger/content/messenger.xhtml'],
@@ -24,7 +29,8 @@ var omaBird = class extends ExtensionCommon.ExtensionAPI {
       onUnloadWindow: win => this.detach(win),
     });
     this.timer = Cc['@mozilla.org/timer;1'].createInstance(Ci.nsITimer);
-    this.timer.initWithCallback(() => this.refresh(), 1500, Ci.nsITimer.TYPE_REPEATING_SLACK);
+    this.timer.initWithCallback(() => { this.refresh(); this.mailBridge.tick(); }, 1500, Ci.nsITimer.TYPE_REPEATING_SLACK);
+    await this.mailBridge.tick();
   }
 
   async refresh() {
@@ -190,9 +196,11 @@ var omaBird = class extends ExtensionCommon.ExtensionAPI {
   onShutdown(isAppShutdown) {
     this.stopped = true;
     this.timer?.cancel();
+    this.mailBridge?.stop();
     if (this.support) this.support.unregisterWindowListener(this.extension.id);
     for (const win of this.windows?.keys() || []) this.detach(win);
     if (this.sheet) this.styles.unregisterSheet(this.sheet, this.styles.USER_SHEET);
     if (!isAppShutdown) Services.obs.notifyObservers(null, 'startupcache-invalidate');
   }
 };
+})();

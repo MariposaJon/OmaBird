@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* Only app chrome is themed. Message HTML and the compose editor retain their fonts. */
 @-moz-document url-prefix("chrome://messenger/"), url("about:3pane"), url("about:message"), url("about:addressbook"), url("about:preferences") {
   :root {

@@ -2,7 +2,7 @@
 
 Betterbird with Omarchy's current colors, desktop font and a keyboard command menu.
 
-OmaBird 0.1 targets Betterbird **153 ESR**. It is a local customization add-on,
+OmaBird 0.2 targets Betterbird **153 ESR**. It is a local customization add-on,
 not a replacement mail engine. Betterbird continues to manage accounts, messages,
 updates and its normal keyboard shortcuts.
 
@@ -17,11 +17,16 @@ updates and its normal keyboard shortcuts.
   when no applicable message is selected.
 - Installs an OmaBird launcher, compose launcher action and a palette-colored SVG
   icon. It does not change the default mail handler.
-- Adds a native Omarchy bar mail icon before the system tray: left-click opens
-  OmaBird, right-click composes a message. Its colors, geometry, tooltip and hover
-  behavior come from Omarchy's own bar components.
+- Adds a native Omarchy bar mail icon with an unread badge and a brief indicator
+  when unread counts increase. Left-click opens a keyboard-driven mail popup;
+  right-click composes a message; middle-click opens Inbox.
+- Shows unread counts by account with Inbox, Compose, Search and Commands actions.
+  Arrow keys or j/k select, Enter runs, and Escape closes the popup. Colors,
+  geometry and interaction use Omarchy's own bar components.
 - Updates on Omarchy `theme-set` and `font-set` hooks. The add-on reads the local
   palette every 1.5 seconds and applies changes while Betterbird is open.
+
+![Mail popup with fictional accounts](docs/mail-popup.png)
 
 ## Install
 
@@ -57,6 +62,16 @@ controllers for message actions. No native-messaging daemon or local HTTP servic
 is needed. The palette is retained if a new file is invalid; all injected styles,
 buttons and event listeners are removed when the add-on is disabled.
 
+Every five seconds the mail bridge exports unread counts and account labels from
+local folder metadata to `~/.local/state/omabird/mail.json`. Junk, trash and
+virtual folders are excluded, including their descendants. No message subjects,
+senders or bodies are exported. State directories are private (0700) and status
+files are private (0600). The shell treats snapshots older than 25 seconds as
+unavailable, so a closed or crashed app cannot leave a live unread badge behind.
+Popup actions use a short-lived local request/response file; requests are limited
+to Inbox, Search and Commands, and account keys are resolved inside Betterbird.
+Compose uses Betterbird's normal command-line action.
+
 An Experiment has unrestricted application/computer access, as stated by
 Thunderbird's add-on installer. OmaBird uses it for local palette reads, app
 styling and menu commands. Source is under `extension/api/implementation.js`.
@@ -73,6 +88,8 @@ The integration suite was run against Betterbird 153.4.0. It verifies:
 - Folder filtering, empty results and Escape behavior.
 - Live Tokyo Night, Catppuccin Latte and Vantablack palettes, including light/dark
   mode in the nested mail pane.
+- Unread updates, exclusion of junk, and Inbox/Search/Commands request routing.
+- Rejection of unsupported actions; closed/stale state and badge formatting.
 - Invalid-palette fallback and cleanup on disable.
 
 The suite requires a **disposable** profile at `.test-profile` and Marionette
@@ -89,10 +106,19 @@ MOZ_DBUS_REMOTE=0 betterbird --no-remote --new-instance \
 # In another terminal:
 python3 omabird.py build
 .venv/bin/python tests/smoke.py
+node tests/model.cjs
 ```
 
-The tests create only synthetic local messages. They briefly change OmaBird's
-palette state, then restore it; they do not switch the desktop theme.
+The tests create only synthetic local messages. Their palette and mail state is
+isolated under `.test-profile/state` using `OMABIRD_STATE_DIR`, so they do not
+change your active OmaBird colors or counts. They do not switch the desktop theme.
+
+## Publishing and licensing
+
+OmaBird's own code is MIT-licensed; Betterbird and Omarchy remain separately
+installed dependencies with their own licenses. This is an independent project.
+See [the publishing guide](docs/PUBLISHING.md) for release packaging, MPL and
+trademark considerations, and the Omarchy marketplace submission route.
 
 ## Remove
 
