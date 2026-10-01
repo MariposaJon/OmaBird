@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "OmaBird",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Omarchy colors, typography and a keyboard action menu for Betterbird.",
   "browser_specific_settings": {
     "gecko": {

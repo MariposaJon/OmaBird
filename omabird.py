@@ -73,11 +73,13 @@ def build():
         for p in sorted((ROOT / 'extension').rglob('*')):
             if p.is_file():
                 relative = p.relative_to(ROOT / 'extension')
-                if str(relative) == 'api/mail-bridge.js':
+                if str(relative) in ['api/mail-bridge.js', 'api/mail-colors.js']:
                     continue
                 if str(relative) == 'api/implementation.js':
                     bridge = (ROOT / 'extension/api/mail-bridge.js').read_text()
-                    z.writestr(str(relative), p.read_text().replace('/* @include-mail-bridge */', bridge))
+                    colors = (ROOT / 'extension/api/mail-colors.js').read_text()
+                    source = p.read_text().replace('/* @include-mail-bridge */', bridge).replace('/* @include-mail-colors */', colors)
+                    z.writestr(str(relative), source)
                 else:
                     z.write(p, relative)
         z.write(ROOT / 'LICENSE', 'LICENSE')

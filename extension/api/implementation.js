@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 var omaBird = (() => {
   /* @include-mail-bridge */
+  /* @include-mail-colors */
   return class extends ExtensionCommon.ExtensionAPI {
   getAPI(context) {
     return { omaBird: { start: async () => this.start(context.extension) } };
@@ -45,24 +46,19 @@ var omaBird = (() => {
         if (!/^#[0-9a-f]{6}$/i.test(c[key])) throw new Error('Invalid palette color: ' + key);
       }
       if (!['light', 'dark'].includes(data.mode) || typeof data.font !== 'string' || data.font.length > 200) throw new Error('Invalid palette metadata');
-      const mix = (a, b, amount) => {
-        const values = [1, 3, 5].map(i => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - amount) + parseInt(b.slice(i, i + 2), 16) * amount));
-        return '#' + values.map(v => v.toString(16).padStart(2, '0')).join('');
-      };
-      const lum = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
-        .map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4)
-        .reduce((sum, v, i) => sum + v * [.2126, .7152, .0722][i], 0);
-      const onAccent = lum(c.accent) > .179 ? '#000000' : '#ffffff';
+      const {mix, luminance} = OmaBirdColors;
+      const onAccent = luminance(c.accent) > .179 ? '#000000' : '#ffffff';
       const tokens = {
         bg: c.background, panel: c.dark_background, fg: c.foreground,
         hover: c.lighter_background, selection: c.selection, accent: c.accent,
         border: mix(c.background, c.foreground, .23), secondary: mix(c.background, c.foreground, .72),
         'on-accent': onAccent,
+        ...OmaBirdColors.mailTokens(data),
       };
       const vars = Object.entries(tokens).map(([k, v]) => `--oma-${k}: ${v} !important;`).join('\n');
       const font = JSON.stringify(data.font).replace(/</g, '\\3c ');
       const tokenCss = `@-moz-document url-prefix("chrome://messenger/"), url("about:3pane"), url("about:message"), url("about:addressbook"), url("about:preferences") { :root { ${vars} --oma-font: ${font}; --oma-mode: ${data.mode}; } }`;
-      const uri = Services.io.newURI('data:text/css;charset=utf-8,' + encodeURIComponent(tokenCss + this.css));
+      const uri = Services.io.newURI('data:text/css;charset=utf-8,' + encodeURIComponent(tokenCss + this.css + this.messageFontCss(font)));
       if (this.stopped) return;
       this.styles.loadAndRegisterSheet(uri, this.styles.USER_SHEET);
       if (this.sheet) this.styles.unregisterSheet(this.sheet, this.styles.USER_SHEET);
@@ -76,6 +72,17 @@ var omaBird = (() => {
       if (String(error) !== this.lastError) console.error('OmaBird palette:', error);
       this.lastError = String(error);
     } finally { this.refreshing = false; }
+  }
+
+  messageFontCss(font) {
+    // Normal user-origin rules lose to the message's author CSS and <font face>.
+    // Set the root default; body inherits so an explicitly styled html element wins too.
+    return `@-moz-document url-prefix("imap:"), url-prefix("mailbox:"), url-prefix("news:"), url-prefix("snews:") {
+      @media screen {
+        :root { font-family: ${font}, monospace; }
+        body, .moz-text-plain, .moz-text-flowed { font-family: inherit; }
+      }
+    }`;
   }
 
   updateLabel(win) {

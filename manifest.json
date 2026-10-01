@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "local.omabird",
   "name": "OmaBird",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Live unread counts, account inboxes and mail shortcuts for Betterbird.",
   "kinds": [
     "bar-widget"

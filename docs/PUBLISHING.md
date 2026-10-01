@@ -41,7 +41,7 @@ Primary references:
    checkout, builds the XPI, exports the committed source archive, validates the
    exported plugin (without development virtualenv files), and writes checksums.
 4. Create a GitHub release for the corresponding tag and attach:
-   `dist/omabird.xpi`, `dist/OmaBird-0.2.0.tar.gz`, and `dist/SHA256SUMS`.
+   `dist/omabird.xpi`, `dist/OmaBird-0.3.0.tar.gz`, and `dist/SHA256SUMS`.
 5. In the release notes state: Omarchy Quattro is required, Betterbird 153 ESR
    was tested, the add-on uses a Thunderbird Experiment API, and installation
    requires both the helper/Omarchy plugin and the XPI.

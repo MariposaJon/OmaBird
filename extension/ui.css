@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Only app chrome is themed. Message HTML and the compose editor retain their fonts. */
+/* App chrome colors and hierarchy. Message font fallback is generated separately. */
 @-moz-document url-prefix("chrome://messenger/"), url("about:3pane"), url("about:message"), url("about:addressbook"), url("about:preferences") {
   :root {
     color-scheme: var(--oma-mode) !important;
@@ -84,6 +84,68 @@
   #folderTree li:not(.selected) > .container:hover, #threadTree tr:not(.selected):hover {
     background-color: var(--oma-hover) !important;
   }
+
+  /* Subjects lead; correspondent and date text support them. Tagged rows retain
+     Betterbird's own tag colors rather than losing their semantic cues. */
+  #threadTree tr:not([data-properties~="tagged"]) {
+    --oma-row-subject: var(--oma-mail-subject);
+    --oma-row-read-subject: var(--oma-mail-read-subject);
+    --oma-row-meta: var(--oma-mail-meta);
+    --oma-row-read-meta: var(--oma-mail-read-meta);
+  }
+  #threadTree tr:not([data-properties~="tagged"]):not(.selected):hover {
+    --oma-row-subject: var(--oma-mail-hover-subject);
+    --oma-row-read-subject: var(--oma-mail-hover-read-subject);
+    --oma-row-meta: var(--oma-mail-hover-meta);
+    --oma-row-read-meta: var(--oma-mail-hover-read-meta);
+  }
+  #threadTree tr:not([data-properties~="tagged"]).selected {
+    --oma-row-subject: var(--oma-mail-selected-subject);
+    --oma-row-read-subject: var(--oma-mail-selected-read-subject);
+    --oma-row-meta: var(--oma-mail-selected-meta);
+    --oma-row-read-meta: var(--oma-mail-selected-read-meta);
+  }
+  #threadTree tr:not([data-properties~="tagged"]) :is(.subject, .subject-line > span) {
+    color: var(--oma-row-subject) !important;
+    font-weight: 650 !important;
+  }
+  #threadTree tr:not([data-properties~="tagged"]) :is(.sender, .sendercol-column,
+    .recipientcol-column, .correspondentcol-column, .date, .datecol-column, .receivedcol-column) {
+    color: var(--oma-row-meta) !important;
+    font-weight: 400 !important;
+    opacity: 1 !important;
+  }
+  #threadTree tr[data-properties~="unread"]:not([data-properties~="tagged"]) :is(.subject, .subject-line > span),
+  #threadTree tr.collapsed[data-properties~="hasUnread"]:not([data-properties~="tagged"]) :is(.subject, .subject-line > span) {
+    font-weight: 700 !important;
+  }
+  #threadTree tr:not([data-properties~="unread"]):not(.collapsed[data-properties~="hasUnread"]):not([data-properties~="tagged"])
+    :is(.subject, .subject-line > span) {
+    color: var(--oma-row-read-subject) !important;
+    font-weight: 400 !important;
+  }
+  #threadTree tr:not([data-properties~="unread"]):not(.collapsed[data-properties~="hasUnread"]):not([data-properties~="tagged"])
+    :is(.sender, .sendercol-column, .recipientcol-column, .correspondentcol-column, .date, .datecol-column, .receivedcol-column) {
+    color: var(--oma-row-read-meta) !important;
+  }
+  #threadTree .card-layout .sender { font-size: .9rem !important; }
+  #threadTree .card-layout .date { font-size: .85rem !important; }
+  #threadTree .card-layout:not(.selected) {
+    box-shadow: inset 0 -1px color-mix(in srgb, var(--oma-border) 45%, transparent);
+  }
+  #threadTree .card-layout[data-properties~="unread"] {
+    --read-status-fill: var(--oma-accent) !important;
+    --read-status-stroke: var(--oma-accent) !important;
+  }
+  #messageHeader #expandedsubjectBox,
+  #messageHeader #expandedsubjectBox .headerValue {
+    color: var(--oma-mail-header-subject) !important;
+    font-weight: 650 !important;
+  }
+  #messageHeader :is(.header-recipient, .recipient-multi-line-address, .message-header-datetime) {
+    color: var(--oma-mail-header-meta) !important;
+  }
+
   :is(button, input, toolbarbutton):focus-visible {
     outline: 2px solid var(--oma-accent) !important;
     outline-offset: 2px;
